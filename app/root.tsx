@@ -9,6 +9,9 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Provider } from "./components/ui/provider";
+import { Box, Flex } from "@chakra-ui/react";
+import Sidebar from "./components/ui/sidebar";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,7 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <Provider>{children}</Provider>
         <ScrollRestoration />
         <Scripts />
       </body>
