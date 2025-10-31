@@ -1,4 +1,12 @@
-import { Box, Center, HStack, Image, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  HStack,
+  Image,
+  Span,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { NavLink } from "react-router";
 import Iconify from "./iconify";
 import type { SidebarItem } from "~/routes/dashboard/_layout";
@@ -25,8 +33,13 @@ export default function Sidebar({
       >
         <Stack gap={"34px"}>
           <Center w={"full"}>
-            <Text fontSize={"xl"} color={"orange.500"} fontWeight={"bold"}>
-              Griya Care
+            <Text
+              fontSize={"3xl"}
+              color={"orange.500"}
+              fontWeight={"bold"}
+              fontStyle={"italic"}
+              >
+              Griya<Span color={"blue.600"}>Care</Span>
             </Text>
           </Center>
           <Stack w={"full"}>

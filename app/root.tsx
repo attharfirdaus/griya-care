@@ -12,6 +12,7 @@ import "./app.css";
 import { Provider } from "./components/ui/provider";
 import { Box, Flex } from "@chakra-ui/react";
 import Sidebar from "./components/ui/sidebar";
+import { Toaster } from "./components/ui/toaster";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -36,7 +37,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          {children}
+          <Toaster />
+        </Provider>
         <ScrollRestoration />
         <Scripts />
       </body>

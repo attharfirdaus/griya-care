@@ -1,10 +1,153 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { Button, Flex, Span, Stack, Text } from "@chakra-ui/react";
+import InputField, { PasswordField } from "~/components/ui/input-field";
+import { z } from "zod";
+import { useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FormProvider, useForm } from "react-hook-form";
+import { useAuthStore } from "~/store/auth-store";
+import { useNavigate } from "react-router";
+import { supabase } from "~/supabase-client";
+import { toaster } from "~/components/ui/toaster";
+
+const loginSchema = z.object({
+  email: z
+    .email("Email format is invalid")
+    .min(5, "Email must be at least 5 characters long"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+  const [isPending, startTransition] = useTransition();
+  const methods = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+  const setUser = useAuthStore((s) => s.setUser);
+  const navigate = useNavigate();
+
+  function onSubmit(data: LoginForm) {
+    startTransition(async () => {
+      const { data: userData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) {
+        toaster.create({
+          title: "Login Failed",
+          description: error.message.includes("Invalid login credentials")
+            ? "Incorrect email or password. Please try again!"
+            : "Something went wrong during login. Please try again later!",
+          type: "error",
+        });
+        return;
+      }
+      if (!userData.session) {
+        toaster.create({
+          title: "Login Failed",
+          description:
+            "No active session found. Please check your credentials.",
+          type: "error",
+        });
+        return;
+      }
+
+      const accessToken = userData.session?.access_token;
+      const user = userData.user;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single()
+
+      setUser({
+        id: user!.id,
+        email: user!.email!,
+        name: profile?.name,
+        role: profile?.role,
+        accessToken,
+      });
+
+      toaster.create({
+        title: "Login Successful",
+        description: `Welcome, ${profile?.name}!`,
+        type: "success",
+      });
+
+      navigate("/dashboard/pelanggan");
+    });
+  }
+
   return (
     <>
-      <Flex bg={"gray.50"}>
-        <Text color={"black"}>Apakek</Text>
+      <Flex
+        bg={"gray.50"}
+        h={"100vh"}
+        bgImage={"url(/images/login-bg.jpg)"}
+        bgRepeat={"no-repeat"}
+        bgSize={"cover"}
+        alignItems={"center"}
+        justifyContent={"end"}
+        px={"15vw"}
+      >
+        <Stack bg={"white/50"} rounded={"xl"} gap={6} p={8} minW={"500px"}>
+          <Stack gap={0}>
+            <Text fontSize={"16px"} fontWeight={"normal"} color={"black"}>
+              Welcome to{" "}
+              <Span
+                fontWeight={"bold"}
+                color={"orange.500"}
+                fontStyle={"italic"}
+                fontSize={"18px"}
+              >
+                Griya<Span color={"blue.600"}>Care</Span>
+              </Span>
+            </Text>
+            <Text fontSize={"40px"} fontWeight={"bold"} color={"black"}>
+              Login
+            </Text>
+          </Stack>
+          <FormProvider {...methods}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                methods.handleSubmit(onSubmit)(e);
+              }}
+            >
+              <Stack gap={6} alignItems={"end"}>
+                <InputField
+                  placeholder="example@gmail.com"
+                  label="Email"
+                  isRequired
+                  type="email"
+                  name={"email"}
+                />
+                <PasswordField
+                  placeholder="Your password"
+                  label="Password"
+                  isRequired
+                  name="password"
+                />
+                <Button
+                  type="submit"
+                  borderRadius={"lg"}
+                  w={"200px"}
+                  bg={"blue.400"}
+                  color={"white"}
+                  loading={isPending}
+                >
+                  Login
+                </Button>
+              </Stack>
+            </form>
+          </FormProvider>
+        </Stack>
       </Flex>
     </>
   );
