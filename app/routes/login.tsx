@@ -11,9 +11,11 @@ import { toaster } from "~/components/ui/toaster";
 
 const loginSchema = z.object({
   email: z
-    .email("Email format is invalid")
-    .min(5, "Email must be at least 5 characters long"),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
+    .email("Format email salah")
+    .min(5, "Email harus memiliki jumlah minimal 5 karakter"),
+  password: z
+    .string()
+    .min(8, "Password harus memiliki jumlah minimal 8 karakter"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -39,19 +41,19 @@ export default function Login() {
 
       if (error) {
         toaster.create({
-          title: "Login Failed",
+          title: "Gagal Masuk",
           description: error.message.includes("Invalid login credentials")
-            ? "Incorrect email or password. Please try again!"
-            : "Something went wrong during login. Please try again later!",
+            ? "Email atau kata sandi salah. Silakan coba lagi!"
+            : "Terjadi kesalahan saat login. Silakan coba lagi nanti!",
           type: "error",
         });
         return;
       }
       if (!userData.session) {
         toaster.create({
-          title: "Login Failed",
+          title: "Gagal Masuk",
           description:
-            "No active session found. Please check your credentials.",
+            "Tidak ada sesi aktif yang ditemukan. Silakan periksa kredensial Anda.",
           type: "error",
         });
         return;
@@ -64,7 +66,7 @@ export default function Login() {
         .from("profiles")
         .select("*")
         .eq("id", user.id)
-        .single()
+        .single();
 
       setUser({
         id: user!.id,
@@ -75,8 +77,8 @@ export default function Login() {
       });
 
       toaster.create({
-        title: "Login Successful",
-        description: `Welcome, ${profile?.name}!`,
+        title: "Login Berhasil",
+        description: `Selamat datang, ${profile?.name}!`,
         type: "success",
       });
 
@@ -99,7 +101,7 @@ export default function Login() {
         <Stack bg={"white/50"} rounded={"xl"} gap={6} p={8} minW={"500px"}>
           <Stack gap={0}>
             <Text fontSize={"16px"} fontWeight={"normal"} color={"black"}>
-              Welcome to{" "}
+              Selamat datang di{" "}
               <Span
                 fontWeight={"bold"}
                 color={"orange.500"}
@@ -110,7 +112,7 @@ export default function Login() {
               </Span>
             </Text>
             <Text fontSize={"40px"} fontWeight={"bold"} color={"black"}>
-              Login
+              Masuk
             </Text>
           </Stack>
           <FormProvider {...methods}>
@@ -129,8 +131,8 @@ export default function Login() {
                   name={"email"}
                 />
                 <PasswordField
-                  placeholder="Your password"
-                  label="Password"
+                  placeholder="Kata sandi Anda"
+                  label="Kata Sandi"
                   isRequired
                   name="password"
                 />
@@ -142,7 +144,7 @@ export default function Login() {
                   color={"white"}
                   loading={isPending}
                 >
-                  Login
+                  Masuk
                 </Button>
               </Stack>
             </form>

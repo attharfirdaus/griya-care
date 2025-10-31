@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { NavLink } from "react-router";
 import Iconify from "./iconify";
-import type { SidebarItem } from "~/routes/dashboard/_layout";
+import type { SidebarItem } from "~/routes/(dashboard)/_layout";
 
 export default function Sidebar({
   listSidebar,
