@@ -82,7 +82,7 @@ export default function Login() {
         type: "success",
       });
 
-      navigate("/dashboard/pelanggan");
+      navigate("/pelanggan");
     });
   }
 

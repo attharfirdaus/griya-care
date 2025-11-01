@@ -1,4 +1,4 @@
-import { Field, Input, Span, Text } from "@chakra-ui/react";
+import { Field, Input, Span, Text, Textarea } from "@chakra-ui/react";
 import { Controller, useFormContext } from "react-hook-form";
 import { PasswordInput } from "./password-input";
 
@@ -113,3 +113,61 @@ export function PasswordField({
     </Field.Root>
   );
 }
+
+type TextAreaFieldProps = {
+  placeholder?: string;
+  label?: string;
+  isRequired?: boolean;
+  size?: "xs" | "sm" | "md" | "lg";
+  name: string;
+  rows?: number;
+};
+
+export const TextAreaField = ({
+  placeholder,
+  label,
+  isRequired = false,
+  size = "md",
+  name,
+  rows = 4,
+}: TextAreaFieldProps) => {
+  const { control } = useFormContext();
+
+  return (
+    <Field.Root>
+      {label && (
+        <Field.Label>
+          <Text fontSize={"sm"} color={"gray.700"}>
+            {label}
+          </Text>
+          {isRequired && <Span color="red.400"> *</Span>}
+        </Field.Label>
+      )}
+
+      <Controller
+        name={name}
+        control={control}
+        render={({ field, fieldState: { error } }) => (
+          <>
+            <Textarea
+              {...field}
+              placeholder={placeholder}
+              size={size}
+              color={"black"}
+              border="1.5px solid #E2E8F0"
+              bg={"white"}
+              borderRadius={"lg"}
+              rows={rows}
+              resize={"vertical"}
+            />
+            {error && (
+              <Text fontSize={"xs"} color={"red.500"}>
+                {error.message}
+              </Text>
+            )}
+          </>
+        )}
+      />
+    </Field.Root>
+  );
+};
