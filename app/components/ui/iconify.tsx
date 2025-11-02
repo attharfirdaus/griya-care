@@ -7,12 +7,27 @@ export default function Iconify({
   ...rest
 }: Omit<FlexProps, "flexShrink" | "boxsize"> & {
   icon: string;
-  boxSize?: string;
+  boxSize?: string | number;
   color?: string;
 }) {
+  const size =
+    typeof boxSize === "number" ? `${boxSize}px` : (boxSize as string);
+
   return (
-    <Flex fontSize={boxSize} boxSize={boxSize} flexShrink={0} {...rest}>
-      <Icon icon={icon} fontSize={boxSize} />
+    <Flex
+      align={"center"}
+      justify={"center"}
+      w={size}
+      h={size}
+      flexShrink={0}
+      {...rest}
+    >
+      <Icon
+        icon={icon}
+        width={size}
+        height={size}
+        style={{ display: "block", width: size, height: size }}
+      />
     </Flex>
   );
 }

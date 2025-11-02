@@ -1,4 +1,4 @@
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import FormModal from "../ui/modal";
 import { Button, Stack } from "@chakra-ui/react";
 import Iconify from "../ui/iconify";
@@ -22,18 +22,23 @@ const CustomerSchema = z.object({
   service_package: z.string().min(1, "Pilih paket langganan pelanggan"),
 });
 
-type AddCustomerForm = z.infer<typeof CustomerSchema>;
+type CustomerForm = z.infer<typeof CustomerSchema>;
 
-type AddCustomerModalProps = {
-  onCustomerAdded?: (newCustomer: Customer) => void;
+type CustomerModalProps = {
+  onSuccess?: (customer: Customer, type: "add" | "edit") => void;
+  type: "add" | "edit";
+  customer?: Customer;
 };
 
-export default function AddCustomerModal({
-  onCustomerAdded,
-}: AddCustomerModalProps) {
+export default function CustomerFormModal({
+  onSuccess,
+  type,
+  customer,
+}: CustomerModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const methods = useForm<AddCustomerForm>({
+
+  const methods = useForm<CustomerForm>({
     defaultValues: {
       name: "",
       phone: "",
@@ -43,7 +48,19 @@ export default function AddCustomerModal({
     },
   });
 
-  async function handleSubmit(data: AddCustomerForm) {
+  useEffect(() => {
+    if (type === "edit" && customer) {
+      methods.reset({
+        name: customer.name ?? "",
+        phone: customer.phone ?? "",
+        email: customer.email ?? "",
+        address: customer.address ?? "",
+        service_package: customer.service_package ?? "",
+      });
+    }
+  }, [type, customer, methods]);
+
+  async function handleSubmit(data: CustomerForm) {
     const parsed = CustomerSchema.safeParse(data);
     if (!parsed.success) {
       const message = parsed.error.issues[0]?.message ?? "Data tidak valid";
@@ -57,48 +74,82 @@ export default function AddCustomerModal({
     }
 
     startTransition(async () => {
-      const { data: insertedData, error } = await supabase
-        .from("customers")
-        .insert({ ...parsed.data, status: "active" })
-        .select()
-        .single();
+      let response;
+
+      if (type === "add") {
+        response = await supabase
+          .from("customers")
+          .insert({ ...parsed.data, status: "active" })
+          .select()
+          .single();
+      } else if (type === "edit" && customer?.id) {
+        response = await supabase
+          .from("customers")
+          .update(parsed.data)
+          .eq("id", customer.id)
+          .select()
+          .single();
+      }
+
+      const { data: savedData, error } = response ?? {};
 
       if (error) {
         toaster.create({
-          title: "Gagal Menambahkan Pelanggan",
+          title:
+            type === "add"
+              ? "Gagal Menambahkan Pelanggan"
+              : "Gagal Mengubah Pelanggan",
           description: error.message,
           type: "error",
         });
       } else {
         toaster.create({
           title: "Berhasil",
-          description: "Pelanggan Berhasil Ditambahkan",
+          description:
+            type === "add"
+              ? "Pelanggan Berhasil Ditambahkan"
+              : "Pelanggan berhasil diperbarui",
           type: "success",
         });
+        onSuccess?.(savedData as Customer, type);
         methods.reset();
         setIsOpen(false);
-
-        onCustomerAdded?.(insertedData as Customer);
       }
     });
   }
 
   return (
     <FormModal
-      title="Tambah Pelanggan"
+      title={type === "add" ? "Tambah Pelanggan" : "Ubah Pelanggan"}
       open={isOpen}
       onOpenChange={setIsOpen}
       trigger={
-        <Button
-          size={"xs"}
-          variant={"solid"}
-          borderRadius={"lg"}
-          color={"white"}
-          backgroundColor={"blue.500"}
-          _hover={{ bgColor: "blue.400" }}
-        >
-          <Iconify icon="uil:plus" /> Tambah Pelanggan
-        </Button>
+        type === "add" ? (
+          <Button
+            size={"xs"}
+            variant={"solid"}
+            borderRadius={"lg"}
+            color={"white"}
+            backgroundColor={"blue.500"}
+            _hover={{ bgColor: "blue.400" }}
+          >
+            <Iconify icon="uil:plus" /> Tambah Pelanggan
+          </Button>
+        ) : (
+          <Button
+            variant={"outline"}
+            bg={"green.50"}
+            borderColor={"green.600"}
+            rounded={"lg"}
+            color={"green.600"}
+            flex={1}
+            size={"xs"}
+            gap={1}
+            _hover={{ bg: "green.600", color: "white" }}
+          >
+            Ubah <Iconify icon="tabler:edit" />
+          </Button>
+        )
       }
       actionTrigger={
         <Button
@@ -116,7 +167,7 @@ export default function AddCustomerModal({
       saveButton={
         <Button
           type="submit"
-          form="add-customer-form"
+          form="customer-form"
           rounded={"xl"}
           bg={"blue.500"}
           color={"white"}
@@ -131,7 +182,7 @@ export default function AddCustomerModal({
         <form
           onSubmit={methods.handleSubmit(handleSubmit)}
           style={{ width: "100%" }}
-          id="add-customer-form"
+          id="customer-form"
         >
           <Stack gap={6} w={"full"}>
             <InputField

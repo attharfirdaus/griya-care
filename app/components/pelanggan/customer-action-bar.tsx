@@ -2,13 +2,13 @@ import { Button, HStack, Input, InputGroup } from "@chakra-ui/react";
 import BaseSelect from "../ui/select";
 import { packageItemsWithAll, packageStatusItems } from "~/seeder";
 import Iconify from "../ui/iconify";
-import AddCustomerModal from "./add-customer-modal";
 import type { Customer } from "~/types";
+import CustomerFormModal from "./customer-form-modal";
 
 export default function CustomerActionBar({
-  onCustomerAdded,
+  onSuccess,
 }: {
-  onCustomerAdded?: (customer: Customer) => void;
+  onSuccess?: (customer: Customer, action: "add" | "edit") => void;
 }) {
   return (
     <HStack justify={"space-between"} align={"center"} w={"full"}>
@@ -41,7 +41,10 @@ export default function CustomerActionBar({
             css={{ "--focus-color": "colors.blue.300" }}
           />
         </InputGroup>
-        <AddCustomerModal onCustomerAdded={onCustomerAdded} />
+        <CustomerFormModal
+          onSuccess={(newCustomer) => onSuccess?.(newCustomer, "add")}
+          type="add"
+        />
       </HStack>
     </HStack>
   );

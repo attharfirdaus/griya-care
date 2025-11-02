@@ -3,7 +3,7 @@ import Iconify from "./iconify";
 import { useAuthStore } from "~/store/auth-store";
 
 export default function Navbar() {
-  const user = useAuthStore((s) => s.user)
+  const user = useAuthStore((s) => s.user);
 
   return (
     <HStack
@@ -35,14 +35,23 @@ export default function Navbar() {
         >
           <Menu.Root>
             <Menu.Trigger asChild>
-              <Button variant={"outline"} size={"sm"} color={'gray.500'} _hover={{bg: 'gray.100'}} _expanded={{bg: 'gray.200'}} rounded={'lg'} borderWidth={'2px'} borderColor={'gray.500'}>
-              {user?.name}
+              <Button
+                variant={"outline"}
+                size={"sm"}
+                color={"gray.500"}
+                _hover={{ bg: "gray.100" }}
+                _expanded={{ bg: "gray.200" }}
+                rounded={"lg"}
+                borderWidth={"2px"}
+                borderColor={"gray.500"}
+              >
+                {user?.name}
               </Button>
             </Menu.Trigger>
             <Portal>
               <Menu.Positioner>
-                <Menu.Content bg={'white'} rounded={'lg'} boxShadow={'sm'}>
-                  <Menu.Item value="keluar" color={"fg.error"} bg={'white'}>
+                <Menu.Content bg={"white"} rounded={"lg"} boxShadow={"sm"}>
+                  <Menu.Item value="keluar" color={"fg.error"} bg={"white"}>
                     Keluar
                   </Menu.Item>
                 </Menu.Content>
