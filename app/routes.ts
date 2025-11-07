@@ -5,7 +5,8 @@ export default [
 
   layout("routes/(dashboard)/_layout.tsx", [
     route("pelanggan", "routes/(dashboard)/pelanggan/index.tsx"),
-    route("pelanggan/:slug", "routes/(dashboard)/pelanggan/[slug]/index.tsx")
+    route("pelanggan/:slug", "routes/(dashboard)/pelanggan/[slug]/index.tsx"),
+    route('tiket-gangguan', 'routes/(dashboard)/tiket-gangguan/index.tsx')
   ]),
 ] satisfies RouteConfig;
 

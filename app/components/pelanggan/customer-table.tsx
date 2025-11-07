@@ -114,17 +114,13 @@ export default function CustomerTable({
             </Table.ColumnHeader>
             <Table.ColumnHeader
               borderTopEndRadius={"xl"}
-              color={"black"}
               borderBottomColor={"gray.200"}
-              px={4}
-              fontWeight={"bold"}
-              fontSize={"14px"}
             ></Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {customersLoading ? (
-            <TableSkeleton rows={5} cols={6} />
+            <TableSkeleton rows={5} cols={7} />
           ) : customers.length > 0 ? (
             customers.map((item, index) => (
               <Table.Row key={item.id} bg={"white"} color={"black"} h={"46px"}>

@@ -14,26 +14,25 @@ export default function Pelanggan() {
   const [customersLoading, setCustomersLoading] = useState(false);
 
   const fetchCustomers = useCallback(async () => {
-  try {
-    setCustomersLoading(true);
+    try {
+      setCustomersLoading(true);
 
-    const { data, error } = await supabase
-      .from("customers")
-      .select("*")
-      .order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("❌ Gagal memuat pelanggan:", error.message);
-    } else {
-      setCustomers(data ?? []);
+      if (error) {
+        console.error("Gagal memuat pelanggan:", error.message);
+      } else {
+        setCustomers(data ?? []);
+      }
+    } catch (err) {
+      console.error("Error tak terduga:", err);
+    } finally {
+      setCustomersLoading(false);
     }
-  } catch (err) {
-    console.error("⚠️ Error tak terduga:", err);
-  } finally {
-    setCustomersLoading(false);
-  }
-}, []);
-
+  }, []);
 
   function mutateCustomers(
     customer?: Customer,

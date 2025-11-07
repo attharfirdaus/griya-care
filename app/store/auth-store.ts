@@ -1,12 +1,5 @@
 import { create } from "zustand";
-
-export type User = {
-  id: string;
-  email: string;
-  name?: string;
-  role?: string;
-  accessToken?: string;
-};
+import type { User } from "~/types";
 
 type AuthState = {
   user: User | null;

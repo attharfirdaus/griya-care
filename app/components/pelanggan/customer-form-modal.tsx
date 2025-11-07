@@ -107,7 +107,7 @@ export default function CustomerFormModal({
           title: "Berhasil",
           description:
             type === "add"
-              ? "Pelanggan Berhasil Ditambahkan"
+              ? "Pelanggan berhasil ditambahkan"
               : "Pelanggan berhasil diperbarui",
           type: "success",
         });
@@ -213,7 +213,7 @@ export default function CustomerFormModal({
             <BaseSelect
               name="service_package"
               label="Paket Langganan"
-              placeholder="Pilih paket Langganan"
+              placeholder="Pilih Paket Langganan"
               items={packageItems}
               size="md"
               isRequired
